@@ -8,6 +8,7 @@ from ddpm import script_utils
 def main():
     args = create_argparser().parse_args()
     device = args.device
+    # device = torch.device("cuda:3") if torch.cuda.is_available() else torch.device("cpu")
 
     try:
         diffusion = script_utils.get_diffusion_from_args(args).to(device)
@@ -33,12 +34,17 @@ def main():
 
 def create_argparser():
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
-    defaults = dict(num_images=10000, device=device)
+    defaults = dict(
+        num_images=10, 
+        device=device,
+        schedule_low=0.001,
+        schedule_high=0.02,
+        )
     defaults.update(script_utils.diffusion_defaults())
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model_path", type=str)
-    parser.add_argument("--save_dir", type=str)
+    parser.add_argument("--model_path", default="./ddpm_logs/ddpm_wandb-ddpm-2023-11-07-17-20-iteration-1000-model.pth",type=str)
+    parser.add_argument("--save_dir", default="./ddpm_test", type=str)
     script_utils.add_dict_to_argparser(parser, defaults)
     return parser
 

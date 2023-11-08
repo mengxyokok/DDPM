@@ -105,11 +105,12 @@ def main():
                 test_loss /= len(test_loader)
                 acc_train_loss /= args.log_rate
 
-                wandb.log({
-                    "test_loss": test_loss,
-                    "train_loss": acc_train_loss,
-                    "samples": [wandb.Image(sample) for sample in samples],
-                })
+                if args.log_to_wandb:
+                    wandb.log({
+                        "test_loss": test_loss,
+                        "train_loss": acc_train_loss,
+                        "samples": [wandb.Image(sample) for sample in samples],
+                    })
 
                 acc_train_loss = 0
             
@@ -129,18 +130,18 @@ def main():
 
 
 def create_argparser():
-    device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+    device = torch.device("cuda:2") if torch.cuda.is_available() else torch.device("cpu")
     run_name = datetime.datetime.now().strftime("ddpm-%Y-%m-%d-%H-%M")
     defaults = dict(
         learning_rate=2e-4,
         batch_size=128,
         iterations=800000,
 
-        log_to_wandb=True,
+        log_to_wandb=False,
         log_rate=1000,
         checkpoint_rate=1000,
-        log_dir="~/ddpm_logs",
-        project_name=None,
+        log_dir="./ddpm_logs",
+        project_name="ddpm",
         run_name=run_name,
 
         model_checkpoint=None,
